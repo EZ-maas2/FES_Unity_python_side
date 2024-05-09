@@ -2,9 +2,7 @@
 # We will use a socket port approach with zero mq
 # The python part is gonna act as a subscriber that awaits for the publisher to send a signal
 
-import numpy
 import zmq
-import sounddevice as sd
 from FES_classes.stim_mid import  Stimulation_Mid_Lvl
 from FES_classes.fes import FES
 
@@ -14,21 +12,9 @@ def setupSUB(ip, port, topic = "FES"):
 
     # IP of VR headset
     socket.connect(f"tcp://{ip}:{port}")
-    #socket.connect(f"tcp://10.158.101.101:{port}") # lrz office ip adress
-    #socket.connect(f"tcp://localhost:{port}")
-    socket.subscribe("FES")
+    socket.subscribe(topic)
     return socket
 
-
-def check_message(message, topic):
-    message = message.decode('utf-8')
-
-    if message == topic:
-        return 0
-    elif 'True' in message:
-        return True
-    else:
-        return False
 
 
 def check_message_stimulation(message, topic):
@@ -64,7 +50,8 @@ def setupFES(port):
 
 if __name__ == "__main__":
     #fes_device = setupFES(port='COM7')
-    ip = '192.168.178.85'# home ip for vr
+    ip = '192.168.178.85' # home ip for vr
+    ip = '192.168.178.101' # home ip for desktop
     topic = 'FES'
     port = 5556
     socket = setupSUB(ip, port) # let's try a different format
