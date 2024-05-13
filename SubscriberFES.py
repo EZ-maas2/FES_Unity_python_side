@@ -1,10 +1,10 @@
 # This file is for communication between C# and python
 # We will use a socket port approach with zero mq
 # The python part is gonna act as a subscriber that awaits for the publisher to send a signal
+import datetime
+import time
 
-import numpy
 import zmq
-import sounddevice as sd
 from FES_classes.stim_mid import  Stimulation_Mid_Lvl
 from FES_classes.fes import FES
 
@@ -14,21 +14,9 @@ def setupSUB(ip, port, topic = "FES"):
 
     # IP of VR headset
     socket.connect(f"tcp://{ip}:{port}")
-    #socket.connect(f"tcp://10.158.101.101:{port}") # lrz office ip adress
-    #socket.connect(f"tcp://localhost:{port}")
-    socket.subscribe("FES")
+    socket.subscribe(topic)
     return socket
 
-
-def check_message(message, topic):
-    message = message.decode('utf-8')
-
-    if message == topic:
-        return 0
-    elif 'True' in message:
-        return True
-    else:
-        return False
 
 
 def check_message_stimulation(message, topic):
@@ -63,8 +51,10 @@ def setupFES(port):
 
 
 if __name__ == "__main__":
-    #fes_device = setupFES(port='COM7')
-    ip = '192.168.178.85'# home ip for vr
+    fes_device = setupFES(port='COM7')
+    #ip = '192.168.178.85' # home ip for vr
+    ip = '192.168.178.101' # home ip for desktop
+    #ip = '10.158.101.242' # lrz headset ip address
     topic = 'FES'
     port = 5556
     socket = setupSUB(ip, port) # let's try a different format
@@ -72,15 +62,15 @@ if __name__ == "__main__":
     i = 0
     message = ''
     while message != 'Stop':
-        message = socket.recv() # Here im waiting for the type of stimulation FES device should deliver
-        message = message.decode('utf-8')
-        print(f'{i}: {message}')
-        stimulation = check_message_stimulation(message, topic)
-        if (stimulation != 0):
-            print('stimulating!')
-            #fes_device.mid_lvl_configure(stimulation)
-            #fes_device.maintain(1) # duration is 1 second because this is the update frequency
+            message = socket.recv() # Here im waiting for the type of stimulation FES device should deliver
+            message = message.decode('utf-8')
+            print(f'{i}: {message}:{datetime.datetime.now()}')
+            stimulation = check_message_stimulation(message, topic)
+            if (stimulation != 0):
+                print("bzzz")
+                #fes_device.mid_lvl_configure(stimulation)
+                #fes_device.maintain(duration_ms=1000) # duration is 1 second because this is the update frequency
 
-        i = i+1
+            i = i+1
     print('Stopped!')
     #fes_device.close_port()

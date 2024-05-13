@@ -65,14 +65,14 @@ class FES:
         return ml_update
 
 
-    def maintain(self, duration_s):
+    def maintain(self, duration_ms):
         ml_get_current_data = sciencemode.ffi.new("Smpt_ml_get_current_data*")
-        for i in range(duration_s):
+        print(f"smpt_send_ml_get_current_data")
+        for i in range(duration_ms):
             ml_get_current_data.data_selection = sciencemode.Smpt_Ml_Data_Channels
             ml_get_current_data.packet_number = sciencemode.smpt_packet_number_generator_next(self.device)
             ret = sciencemode.smpt_send_ml_get_current_data(self.device, ml_get_current_data)
-            print(f"smpt_send_ml_get_current_data: {ret}")
-            time.sleep(1)
+            time.sleep(0.001)
 
 
     # takes in stimulation object
