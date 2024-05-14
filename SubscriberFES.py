@@ -54,7 +54,9 @@ if __name__ == "__main__":
     fes_device = setupFES(port='COM7')
     #ip = '192.168.178.85' # home ip for vr
     ip = '192.168.178.101' # home ip for desktop
-    #ip = '10.158.101.242' # lrz headset ip address
+    #ip = '10.158.101.242' # lrz headset ip address 1
+    ip = '10.158.99.80' # lrz headset 2
+    #ip = '10.181.211.229' # ip address laptop eduroam
     topic = 'FES'
     port = 5556
     socket = setupSUB(ip, port) # let's try a different format
@@ -68,9 +70,9 @@ if __name__ == "__main__":
             stimulation = check_message_stimulation(message, topic)
             if (stimulation != 0):
                 print("bzzz")
-                #fes_device.mid_lvl_configure(stimulation)
-                #fes_device.maintain(duration_ms=1000) # duration is 1 second because this is the update frequency
+                fes_device.mid_lvl_configure(stimulation)
+                fes_device.maintain_new(duration_s=0.1) # duration is 1 second because this is the update frequency
 
             i = i+1
     print('Stopped!')
-    #fes_device.close_port()
+    fes_device.close_port()

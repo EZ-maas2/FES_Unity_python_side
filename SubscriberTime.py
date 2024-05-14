@@ -22,6 +22,7 @@ if __name__ == "__main__":
     #ip = '192.168.178.85' # home ip for vr
     ip = '192.168.178.101' # home ip for desktop
     #ip = '10.158.101.242'  # lrz headset ip address
+    ip = '10.158.99.80'
     topic = 'Timer'
     port = 5557
     socket = setupSUB(ip, port, topic) # let's try a different format
