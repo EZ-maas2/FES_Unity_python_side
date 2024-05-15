@@ -57,6 +57,7 @@ if __name__ == "__main__":
     #ip = '10.158.101.242' # lrz headset ip address 1
     ip = '10.158.99.80' # lrz headset 2
     #ip = '10.181.211.229' # ip address laptop eduroam
+    ip = '10.158.102.193'
     topic = 'FES'
     port = 5556
     socket = setupSUB(ip, port) # let's try a different format
