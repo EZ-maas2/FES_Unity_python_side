@@ -3,9 +3,9 @@
 # API wrap from HCI lab in Chicago
 from sciencemode import sciencemode
 import time
+import datetime
 
 class FES:
-
     def __init__(self, PORT):
         print("Initializing FES device...")
         self.device = sciencemode.ffi.new("Smpt_device*")
@@ -47,14 +47,12 @@ class FES:
         return ml_update
 
 
-
     def mid_lvl_configure(self, stimulation_obj_list):
         device = self.device
         ml_update = sciencemode.ffi.new("Smpt_ml_update*")
         ml_update.packet_number = sciencemode.smpt_packet_number_generator_next(device)
 
         if type(stimulation_obj_list) != list:
-            print('There is one or less stimulations, creating a list..')
             stimulation_obj_list = [stimulation_obj_list]
 
         for stimulation_obj in stimulation_obj_list:
@@ -65,14 +63,24 @@ class FES:
         return ml_update
 
 
-    def maintain(self, duration_ms):
+    def maintain(self, duration_s):
         ml_get_current_data = sciencemode.ffi.new("Smpt_ml_get_current_data*")
         print(f"smpt_send_ml_get_current_data")
-        for i in range(duration_ms):
+        for i in range(duration_s):
             ml_get_current_data.data_selection = sciencemode.Smpt_Ml_Data_Channels
             ml_get_current_data.packet_number = sciencemode.smpt_packet_number_generator_next(self.device)
             ret = sciencemode.smpt_send_ml_get_current_data(self.device, ml_get_current_data)
-            time.sleep(0.001)
+            time.sleep(1)
+
+
+    def maintain_new(self, duration_s):
+        start = datetime.datetime.now()
+        ml_get_current_data = sciencemode.ffi.new("Smpt_ml_get_current_data*")
+        print(f"smpt_send_ml_get_current_data")
+        while (datetime.datetime.now() - start) < datetime.timedelta(seconds=duration_s):
+            ml_get_current_data.data_selection = sciencemode.Smpt_Ml_Data_Channels
+            ml_get_current_data.packet_number = sciencemode.smpt_packet_number_generator_next(self.device)
+            ret = sciencemode.smpt_send_ml_get_current_data(self.device, ml_get_current_data)
 
 
     # takes in stimulation object

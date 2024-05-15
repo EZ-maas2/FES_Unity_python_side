@@ -1,0 +1,2 @@
+amplitude = 12, period  = 28, pwm = 150
+['Red:ControlSlow', 'Orange:FESFast', 'Green:FESSlow', 'Black:ControlFast']

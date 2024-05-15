@@ -13,7 +13,7 @@ def MakeSeq():
 if __name__ == "__main__":
     MAX_AMPLITUDE = 50 # mA
     INITIAL_AMP = 0
-    STEP_SIZE = 5
+    STEP_SIZE = 2
     STIMULATION_DURATION = 1
     FES_DEVICE = FES("COM7")
     PERIOD = 28 # 35Hz
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     while not CalibrationFinished:
         stim = Stimulation_Mid_Lvl(amplitude_mA = amp_list[amp_list_ix], period_ms= PERIOD, pulse_width_micros = PWM, channel = 'red')
         if not skip_next:
-            #FES_DEVICE.mid_lvl_stimulate(stim, duration_s= STIMULATION_DURATION)
+            FES_DEVICE.mid_lvl_stimulate(stim, duration_s= STIMULATION_DURATION)
             print("bzz")
         skip_next = False
 
