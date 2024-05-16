@@ -1,15 +1,9 @@
-Amir - stimulation is statistically significant (Compare  FES_Slow to Control_Slow and FES_Fast to Control_Fast)
-Amir -  T-test result for FastControl vs FastFES: t-statistic = 0.9992799019732973, p-value = 0.33090407894873863
-Amir -  T-test result for SlowControl vs SlowFES: t-statistic = 1.900024409664069, p-value = 0.07357100962115055
 
-Elizaveta  - stimulation is statistically significant (Compare  FES_Slow to Control_Slow and FES_Fast to Control_Fast)
-Elizaveta -  T-test result for FastControl vs FastFES: t-statistic = -1.6037221389250078, p-value = 0.12617738103981746
-Elizaveta -  T-test result for SlowControl vs SlowFES: t-statistic = -2.836144138090184, p-value = 0.010953290338141498
-
-Oscar  - no statistical significance
-Nic - no statistical significance
-
-
+--------------------------------------------------------------------------------
+For ALL DATA, kruskal-wallis H test shows 12.449045593791704 statistic, p-value  is 0.005993042632967886
+ALL DATA =  Wilcoxon result for FastControl vs FastFES: statistic = 324.5, p-value = 0.259140549798758, median  FastControl =  2.86, median FastFES = 2.48
+ALL DATA = Wilcoxon result for  SlowControl vs SlowFES: statistic = 299.0, p-value = 0.20411853941356273median SlowControl = 1.77, median SlowFES = 2.26
+ALL DATA =  Wilcoxon result for  SlowControl vs FastControl: statistic = 218.0, p-value = 0.00899504264089046, median SlowControl = 1.77, median FastControl = 2.86
 -------------------------------------------------------------
 Kruskal-wallis test  || if z-value is high, first group has bigger values than the second
 -------------------------------------------------------------

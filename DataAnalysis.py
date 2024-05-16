@@ -2,11 +2,11 @@ import statistics
 
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
-from scipy.stats import ttest_ind, kruskal, wilcoxon
-import  numpy as  np
+from scipy.stats import kruskal, wilcoxon
+
 import os
 import matplotlib.pyplot as plt
-import matplotlib
+
 import seaborn as sns
 
 import pandas as pd
@@ -108,17 +108,24 @@ def try_z(res):
     finally:
         return z
 
+
+def get_specific_group(data, speed, stim):
+    return data[(data['Speed'] == speed) & (data['Stimulation'] == stim)][
+        'Reaction_time']
+
+
 if __name__ == '__main__':
     ANOVA = False
     KRUSKAL = True
     TTEST  = False
     WILCOXON = True
+    CreateAllData = False
     names = ["Amir", "Elizaveta", "Oscar", "Nic"]
 
 
     for name in names:
         participant_data_list = get_participant_data(name)
-        plot_all(name)
+        #plot_all(name)
 
 
         df_data = {"Speed": [participant_data_list[0][1]]*10 + [participant_data_list[1][1]]*10 + [participant_data_list[2][1]]*10 + [participant_data_list[3][1]]*10,
@@ -140,25 +147,57 @@ if __name__ == '__main__':
             print(f"For {name}, kruskal-wallis H test shows {h} statistic, p-value  is {p}")
 
 
+    print("--------------------------------------------------------------------------------")
+    if CreateAllData:
+        all_data = pd.concat([pd.read_csv("Elizaveta_data.csv"), pd.read_csv("Oscar_data.csv"),
+                             pd.read_csv("Amir_data.csv"), pd.read_csv("Nic_data.csv")])
+
+        all_data.sort_values(by = ["Speed", "Stimulation"])
+        all_data.to_csv("Data/all_data.csv")
+
+    all_data = pd.read_csv("Data/all_data.csv")
+    all_fastFES = get_specific_group(all_data, speed="Fast", stim="FES")
+    all_slowFES = get_specific_group(all_data, speed="Slow", stim="FES")
+    all_fastControl  = get_specific_group(all_data, speed="Fast", stim="Control")
+    all_slowControl  = get_specific_group(all_data, speed="Slow", stim="Control")
 
 
-        if ANOVA:
-            model = ols("Reaction_time  ~ C(Speed) + C(Stimulation) + C(Speed):C(Stimulation)", data=df_data).fit()
-            anova = sm.stats.anova_lm(model, typ = 2)
 
-            print("----------------------------------------")
-            print(f"Two-way  ANOVA for {name}: {anova}")
-            with open(f"Data/{name}_ANOVA", 'w') as file:
-                file.write(str(anova))
-            print("----------------------------------------")
+    # Do kruskal  on all data
+    h, p = kruskal(all_slowControl, all_fastControl, all_slowFES, all_fastFES)
+    print(f"For ALL DATA, kruskal-wallis H test shows {h} statistic, p-value  is {p}")
+    res = wilcoxon(all_fastControl, all_fastFES)
+
+    print(f"ALL DATA =  Wilcoxon result for FastControl vs FastFES: statistic = {res.statistic}, p-value = {res.pvalue}, "
+          f"median  FastControl =  {statistics.median(all_fastControl)}, "
+          f"median FastFES = {statistics.median(all_fastFES)}")
+
+    res = wilcoxon(all_slowControl, all_slowFES)
+    print(f"ALL DATA = Wilcoxon result for  SlowControl vs SlowFES: statistic = {res.statistic}, p-value = {res.pvalue}"
+          f"median SlowControl = {statistics.median(all_slowControl)},"
+          f" median SlowFES = {statistics.median(all_slowFES)}")
+
+    res = wilcoxon(all_slowControl, all_fastControl)
+    print(
+        f"ALL DATA =  Wilcoxon result for  SlowControl vs FastControl: statistic = {res.statistic}, p-value = {res.pvalue}, "
+        f"median SlowControl = {statistics.median(all_slowControl)},"
+        f" median FastControl = {statistics.median(all_fastControl)}")
 
 
 
+    # Plot all data as a boxplot
+    plt.figure()
+    plt.title("Game-dependent reaction time")
+    sns.boxplot(data ={'Slow Control': all_slowControl, 'Slow  FES': all_slowFES, 'Fast Control': all_fastControl, 'Fast FES': all_fastFES}, palette="hot")
+    plt.ylabel("Reaction time, s")
+    plt.savefig("Data/Plots/all_data")
+
+    print("--------------------------------------------------------------------------------")
 
 
 
 # post-hoc  testing for groups that showed significance in ANOVA
-    if True:
+    def participantLvlPost(names):
         for name in names:
             data = pd.read_csv(f"{name}_data.csv")
             # Filter data and select column
@@ -175,11 +214,6 @@ if __name__ == '__main__':
             slow_fes_rt = data[(data['Speed'] == 'Slow') & (data['Stimulation'] == 'FES')][
                 'Reaction_time']
 
-            if TTEST:
-                t_stat, p_value = ttest_ind(fast_control_rt, fast_fes_rt)
-                print(f"{name} -  T-test result for FastControl vs FastFES: t-statistic = {t_stat}, p-value = {p_value}")
-                t_stat, p_value = ttest_ind(slow_control_rt,slow_fes_rt)
-                print(f"{name} -  T-test result for SlowControl vs SlowFES: t-statistic = {t_stat}, p-value = {p_value}")
 
             if WILCOXON:
                 res  = wilcoxon(fast_control_rt, fast_fes_rt)
@@ -195,6 +229,10 @@ if __name__ == '__main__':
                 res = wilcoxon(slow_control_rt, fast_control_rt)
                 print(f"{name} -  Wilcoxon result for  SlowControl vs FastControl: statistic = {res.statistic}, p-value = {res.pvalue}, "
                       f"median SlowControl = {statistics.median(slow_control_rt)}, median FastControl = {statistics.median(fast_control_rt)}")
+
+
+
+
 
 
 
