@@ -1,12 +1,13 @@
+import statistics
 
 import statsmodels.api as sm
 from statsmodels.formula.api import ols
-from statsmodels.sandbox.stats.multicomp import multipletests
-from scipy.stats import ttest_ind
+from scipy.stats import ttest_ind, kruskal, wilcoxon
 import  numpy as  np
 import os
 import matplotlib.pyplot as plt
 import matplotlib
+import seaborn as sns
 
 import pandas as pd
 pd.set_option('display.max_columns', None)
@@ -58,18 +59,30 @@ def textToList(line_list):
     return times
 
 
+def name_encode(name):
+    if name == "Amir":
+        return "Participant 1"
+    elif name == "Elizaveta" or name == "Eliza":
+
+        return "Participant 2"
+    elif name == "Oscar":
+        return "Participant 3"
+    elif name == "Nic":
+        return "Participant 4"
+    else: return None
+
 def plot_all_trials(data, name):
-    cmap  =  plt.get_cmap('inferno', 4)
-    hex_codes = [matplotlib.colors.rgb2hex(cmap(i)) for i in range(cmap.N)]
+    #cmap  =  plt.get_cmap('turbo', 4)
+    #hex_codes = [matplotlib.colors.rgb2hex(cmap(i)) for i in range(cmap.N)]
     plt.figure()
     for condition in data:
-        if condition[2] == "FES" and condition[1] == "Fast": col = hex_codes[0]
-        elif condition[2] == "FES" and condition[1] != "Fast": col = hex_codes[1]
-        elif condition[2] != "FES" and condition[1] == "Fast": col = hex_codes[2]
-        else:  col = hex_codes[3]
-        plt.title(condition[0])
+        if condition[2] == "FES" and condition[1] == "Fast": col = '#FF0000' #hex_codes[0]
+        elif condition[2] == "FES" and condition[1] != "Fast": col = '#FD9D00' #hex_codes[1]
+        elif condition[2] != "FES" and condition[1] == "Fast": col = "#B5FA33" #hex_codes[2]
+        else:  col = "#32342E" # hex_codes[3]
+        plt.title(name_encode(condition[0]))
         plt.xlabel("time, s")
-        plt.hist(condition[3], bins =  range(0, int(max(condition[3])) + 1), color=col,  label = condition[1] + condition[2])
+        sns.histplot(condition[3],   label = condition[1] + condition[2], color=col, binwidth=1)  #bins =  range(0, int(max(condition[3])) + 1),
         plt.legend()
     plt.savefig(name)
 
@@ -86,12 +99,24 @@ def plot_all(name):
     plot_keyword(participant_data_list, f"Data/Plots/{name}_FES", "FES", 2)
     plot_keyword(participant_data_list, f"Data/Plots/{name}_Control", "Control", 2)
 
+def try_z(res):
+    try:
+            z  = res.zstatistic
 
+    except:
+            z =  None
+    finally:
+        return z
 
 if __name__ == '__main__':
-    print(np.mean([2, 1, 3, 2]))
-    anovas =[]
-    for name in ["Amir", "Elizaveta", "Oscar", "Nic"]:
+    ANOVA = False
+    KRUSKAL = True
+    TTEST  = False
+    WILCOXON = True
+    names = ["Amir", "Elizaveta", "Oscar", "Nic"]
+
+
+    for name in names:
         participant_data_list = get_participant_data(name)
         plot_all(name)
 
@@ -104,34 +129,73 @@ if __name__ == '__main__':
                    "Reaction_time": participant_data_list[0][3]+participant_data_list[1][3]+participant_data_list[2][3]+participant_data_list[3][3]
                    }
 
-        # Two-way ANOVA
+
 
 
         df_data  = pd.DataFrame(df_data)
         df_data.to_csv(f"{name}_data.csv")
 
-        model = ols("Reaction_time  ~ C(Speed) + C(Stimulation) + C(Speed):C(Stimulation)", data=df_data).fit()
-        anova = sm.stats.anova_lm(model, typ = 2)
-        anovas.append(anova)
-        print("----------------------------------------")
-        print(f"Two-way  ANOVA for {name}: {anova}")
-        with open(f"Data/{name}_ANOVA", 'w') as file:
-            file.write(str(anova))
-        print("----------------------------------------")
-        print(df_data)
+        if KRUSKAL:
+            h, p = kruskal(participant_data_list[0][3], participant_data_list[1][3], participant_data_list[2][3], participant_data_list[3][3])
+            print(f"For {name}, kruskal-wallis H test shows {h} statistic, p-value  is {p}")
 
 
-    for name in ["Elizaveta", "Amir"]:
-        data = pd.read_csv(f"{name}_data.csv")
-        # Filter data and select column
-        fast_control_rt = data[(data['Speed'] == 'Fast') & (data['Stimulation'] == 'Control')][
-            'Reaction_time']
 
-        fast_fes_rt = data[(data['Speed'] == 'Fast') & (data['Stimulation'] == 'FES')][
-            'Reaction_time']
 
-        t_stat, p_value = ttest_ind(fast_control_rt, fast_fes_rt)
-        print(f"{name} -  T-test result for FastControl vs FastFES: t-statistic = {t_stat}, p-value = {p_value}")
+        if ANOVA:
+            model = ols("Reaction_time  ~ C(Speed) + C(Stimulation) + C(Speed):C(Stimulation)", data=df_data).fit()
+            anova = sm.stats.anova_lm(model, typ = 2)
+
+            print("----------------------------------------")
+            print(f"Two-way  ANOVA for {name}: {anova}")
+            with open(f"Data/{name}_ANOVA", 'w') as file:
+                file.write(str(anova))
+            print("----------------------------------------")
+
+
+
+
+
+
+# post-hoc  testing for groups that showed significance in ANOVA
+    if True:
+        for name in names:
+            data = pd.read_csv(f"{name}_data.csv")
+            # Filter data and select column
+            fast_control_rt = data[(data['Speed'] == 'Fast') & (data['Stimulation'] == 'Control')][
+                'Reaction_time']
+
+            fast_fes_rt = data[(data['Speed'] == 'Fast') & (data['Stimulation'] == 'FES')][
+                'Reaction_time']
+
+
+            slow_control_rt = data[(data['Speed'] == 'Slow') & (data['Stimulation'] == 'Control')][
+                'Reaction_time']
+
+            slow_fes_rt = data[(data['Speed'] == 'Slow') & (data['Stimulation'] == 'FES')][
+                'Reaction_time']
+
+            if TTEST:
+                t_stat, p_value = ttest_ind(fast_control_rt, fast_fes_rt)
+                print(f"{name} -  T-test result for FastControl vs FastFES: t-statistic = {t_stat}, p-value = {p_value}")
+                t_stat, p_value = ttest_ind(slow_control_rt,slow_fes_rt)
+                print(f"{name} -  T-test result for SlowControl vs SlowFES: t-statistic = {t_stat}, p-value = {p_value}")
+
+            if WILCOXON:
+                res  = wilcoxon(fast_control_rt, fast_fes_rt)
+
+                print(f"{name} -  Wilcoxon result for FastControl vs FastFES: statistic = {res.statistic}, p-value = {res.pvalue}, "
+                      f"median  FastControl =  {statistics.median(fast_control_rt)}, "
+                      f"median FastFES = {statistics.median(fast_fes_rt)}")
+
+                res = wilcoxon(slow_control_rt, slow_fes_rt)
+                print(f"{name} -  Wilcoxon result for  SlowControl vs SlowFES: statistic = {res.statistic}, p-value = {res.pvalue}"
+                      f"median SlowControl = {statistics.median(slow_control_rt)}, median SlowFES = {statistics.median(slow_fes_rt)}")
+
+                res = wilcoxon(slow_control_rt, fast_control_rt)
+                print(f"{name} -  Wilcoxon result for  SlowControl vs FastControl: statistic = {res.statistic}, p-value = {res.pvalue}, "
+                      f"median SlowControl = {statistics.median(slow_control_rt)}, median FastControl = {statistics.median(fast_control_rt)}")
+
 
 
 

@@ -1,7 +1,40 @@
 Amir - stimulation is statistically significant (Compare  FES_Slow to Control_Slow and FES_Fast to Control_Fast)
 Amir -  T-test result for FastControl vs FastFES: t-statistic = 0.9992799019732973, p-value = 0.33090407894873863
+Amir -  T-test result for SlowControl vs SlowFES: t-statistic = 1.900024409664069, p-value = 0.07357100962115055
+
 Elizaveta  - stimulation is statistically significant (Compare  FES_Slow to Control_Slow and FES_Fast to Control_Fast)
 Elizaveta -  T-test result for FastControl vs FastFES: t-statistic = -1.6037221389250078, p-value = 0.12617738103981746
+Elizaveta -  T-test result for SlowControl vs SlowFES: t-statistic = -2.836144138090184, p-value = 0.010953290338141498
 
 Oscar  - no statistical significance
 Nic - no statistical significance
+
+
+-------------------------------------------------------------
+Kruskal-wallis test  || if z-value is high, first group has bigger values than the second
+-------------------------------------------------------------
+
+For Amir, kruskal-wallis H test shows 8.115939172064222 statistic, p-value  is 0.04367538751153858
+Amir -  Wilcoxon result for FastControl vs FastFES: statistic = 13.0, p-value = 0.16015625
+Amir -  Wilcoxon result for  SlowControl vs SlowFES: statistic = 2.0, p-value = 0.015155973880974605
+(significant) median slowcontrol = 2.79, median slowfes = 1.9899999999999998 -> SlowControl takes longer than Slow FES
+Amir -  Wilcoxon result for  SlowControl vs FastControl: statistic = 22.0, p-value = 0.625
+
+For Elizaveta, kruskal-wallis H test shows 18.34525752884886 statistic, p-value  is 0.0003733063929003225
+Elizaveta -  Wilcoxon result for FastControl vs FastFES: statistic = 13.0, p-value = 0.16015625
+Elizaveta -  Wilcoxon result for  SlowControl vs SlowFES: statistic = 4.0, p-value = 0.013671875
+ (significant) slowcontrol = 1.32, median slowfes = 2.85 -> SlowFES takes longer than Slow Control
+Elizaveta -  Wilcoxon result for  SlowControl vs FastControl: statistic = 1.0, p-value = 0.00390625
+
+For Oscar, kruskal-wallis H test shows 14.89107545045044 statistic, p-value  is 0.001912138457826845
+Oscar -  Wilcoxon result for FastControl vs FastFES: statistic = 16.0, p-value = 0.275390625
+Oscar -  Wilcoxon result for  SlowControl vs SlowFES: statistic = 5.0, p-value = 0.01953125
+ (significant) median slowcontrol = 1.0, median slowfes = 3.05 -> SlowFES takes longer than Slow Control
+Oscar -  Wilcoxon result for  SlowControl vs FastControl: statistic = 2.0, p-value = 0.005859375
+ (significant) median slowcontrol = 1.0, median FastControl = 2.75 -> FastControl takes longer than SlowControl
+
+
+For Nic, kruskal-wallis H test shows 3.8630418465002787 statistic, p-value  is 0.2766379708868986
+Nic -  Wilcoxon result for FastControl vs FastFES: statistic = 15.0, p-value = 0.232421875
+Nic -  Wilcoxon result for  SlowControl vs SlowFES: statistic = 14.0, p-value = 0.193359375
+Nic -  Wilcoxon result for  SlowControl vs FastControl: statistic = 26.0, p-value = 0.921875
